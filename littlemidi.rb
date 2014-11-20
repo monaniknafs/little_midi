@@ -66,27 +66,9 @@ while m = input.gets[0]
 		note = m[:data] # an array [status, pitch, velocity]
 		ts = m[:timestamp] # milliseconds after input.open
 
-		# core action on input
 		if record
-		 	if note[0] == 144
-		 		buff << {:data => note,
-		 				:timestamp => ts - start_ts, 
-		 				:relative_ts => ts - last_ts}
-		 		last_ts = ts
-				puts note_letter(note[1])
-			end
-		else
-		 	# not recording
-		 	# only print the on-notes
-		 	if note[0] == 144
-		 		# only print the pitch-value
-		 		puts note_letter(note[1])
-		 	end
-		end
-
 		# set record value
 		# use sustain button for recording
-		if record 
 			if note == [176,64,0]
 				record = false
 				puts "stopped recording"
@@ -101,7 +83,18 @@ while m = input.gets[0]
 					# puts lock_to_structure(buff, 1/16)
 				end
 			end
+
+			# core action
+		 	if note[0] == 144
+		 		buff << {:data => note,
+		 				:timestamp => ts - start_ts, 
+		 				:relative_ts => ts - last_ts}
+		 		last_ts = ts
+				puts note_letter(note[1])
+			end
 		else
+		 	# not recording
+		 	# initialise buffer if applicable
 			if note == [176,64,127]
 				buff = Array.new
 				start_ts = ts # marks beginning of recording
@@ -109,6 +102,13 @@ while m = input.gets[0]
 				record = true
 				puts "started recording"
 			end
+
+			# core action
+		 	# only print the on-notes
+		 	if note[0] == 144
+		 		# only print the pitch-value
+		 		puts note_letter(note[1])
+		 	end
 		end
 	end
 end
